@@ -1,4 +1,4 @@
-import React, { useState, useEffect, MouseEvent } from 'react';
+import React, { useState, useEffect, MouseEvent, useRef } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Day from './components/Day';
@@ -13,6 +13,7 @@ function App() {
   const [weatherDays, handleDays] = useState<Array<IDayWeather>>([]);
   const [hourlyDays, handleHourlyDays] = useState<Array<IHourWeather>>();
   const [allHourly, handleAllHourly] = useState<Array<IHourWeather>>();
+  const refMount = useRef(false);
 
   useEffect(() => {
     fetch('https://api.openweathermap.org/data/2.5/onecall?lat=51.180&lon=-115.565&units=metric&appid=e46bf7032f75d50e0d34fe6c40f8cf6b')
@@ -25,13 +26,16 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (selectedDay)
+    if (selectedDay && !refMount.current) {
       setHourly(selectedDay);
+      refMount.current = true;
+    }
   }, [selectedDay]);
-  
+
   const handleClick = (index: number) => (e: MouseEvent) => {
     e.preventDefault();
     handleSelectedDay(weatherDays[index]);
+    setHourly(weatherDays[index]);
   }
 
   const setHourly = (sDay: IDayWeather) => {
